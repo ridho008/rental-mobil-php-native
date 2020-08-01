@@ -5,10 +5,15 @@
 			case 'user':
 				echo "Kelola User";
 				break;
-			
-			default:
-				# code...
+			case 'mobil':
+				echo "Data Rental Mobil";
 				break;
+			case 'order':
+				echo "Formulir Order";
+				break;
+			default:
+			echo "Beranda";
+			break;
 		}
 	} else {
 		echo "Beranda";
@@ -21,6 +26,7 @@
 </ol>
 <div class="row">
 	<div class="col-md">
+
 		<?php 
 		if(isset($page)) {
 			switch ($page) {
@@ -29,7 +35,16 @@
 					break;
 				case 'huser':
 					require_once 'page/admin/hadmin.php';
-					break;	
+					break;
+				case 'mobil':
+					require_once 'page/mobil/mobil.php';
+					break;
+				case 'hmobil':
+					require_once 'page/mobil/hmobil.php';
+					break;
+				case 'order':
+					require_once 'page/order/order.php';
+					break;
 			}
 		} else {
 			require_once 'index.php';

@@ -7,9 +7,10 @@
                 Beranda
             </a>
             <a class="nav-link" href="?p=order">
-                <div class="sb-nav-link-icon"><i class="fas fa-order"></i></div>
+                <div class="sb-nav-link-icon"><i class="fa fa-cart-plus"></i></div>
                 Order
             </a>
+            <?php if($_SESSION['level'] == 1) : ?>
             <a class="nav-link" href="?p=mobil">
                 <div class="sb-nav-link-icon"><i class="fas fa-car"></i></div>
                 Mobil
@@ -18,8 +19,9 @@
                 <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                 Kelola Users
             </a>
-            <a class="nav-link" href="logout.php">
-                <div class="sb-nav-link-icon"><i class="fas fa-logout"></i></div>
+            <?php endif; ?>
+            <a class="nav-link" href="logout.php" onclick="return confirm('Logout ?')">
+                <div class="sb-nav-link-icon"><i class="fa fa-share"></i></div>
                 Logout
             </a>
         </div>

@@ -78,3 +78,42 @@ function ubahuser($data)
   $query = $conn->query("UPDATE tb_user SET nama_user = '$nama', username = '$username', password = '$password_hash', jk_user = '$jk', level = '2' WHERE id_user = $id_user ") or die(mysqli_error($conn));
   return $conn->affected_rows;
 }
+
+
+
+// -------------------MOBIL-----------------------
+
+function tambahmobil($data)
+{
+  global $conn;
+  $polisi = htmlspecialchars($data['polisi']);
+  $merk = htmlspecialchars($data['merk']);
+  $tahun = htmlspecialchars($data['tahun']);
+  $hrg_mobil = htmlspecialchars($data['hrg_mobil']);
+
+  if(empty($polisi && $merk && $tahun && $hrg_mobil)) {
+    echo "<script>alert('Inputan tidak boleh kosong!');window.location='?p=mobil';</script>";
+    return false;
+  }
+
+  $sqlMobil = $conn->query("INSERT INTO tb_mobil VALUES (null, '$polisi', '$merk', '$tahun', '$hrg_mobil', 'Aktif')") or die(mysqli_error($conn));
+  return $conn->affected_rows;
+}
+
+function ubahmobil($data)
+{
+  global $conn;
+  $id_mobil = htmlspecialchars($data['id']);
+  $polisi = htmlspecialchars($data['polisi']);
+  $merk = htmlspecialchars($data['merk']);
+  $tahun = htmlspecialchars($data['tahun']);
+  $hrg_mobil = htmlspecialchars($data['hrg_mobil']);
+
+  if(empty($polisi && $merk && $tahun && $hrg_mobil)) {
+    echo "<script>alert('Inputan tidak boleh kosong!');window.location='?p=mobil';</script>";
+    return false;
+  }
+
+  $sqlMobil = $conn->query("UPDATE tb_mobil SET no_polisi = '$polisi', merk = '$merk', tahun = '$tahun', hrg_mobil = '$hrg_mobil' WHERE id_mobil = $id_mobil") or die(mysqli_error($conn));
+  return $conn->affected_rows;
+}

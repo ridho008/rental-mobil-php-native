@@ -18,6 +18,10 @@ if(isset($_POST['ubahuser'])) {
 	}
 }
 ?>
+<?php 
+// cek jika ada level 2 yang ingin mengakses level 1, akan di redirect ke halaman index utamanya.
+if($_SESSION['level'] == 1) {
+?>
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#formTambahUser">
   Tambah User
 </button>
@@ -50,7 +54,7 @@ if(isset($_POST['ubahuser'])) {
 										<td><?= $dUser['level'] == '1' ? 'Admin' : 'User'; ?></td>
 										<td>
 											<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#formUbahUser<?= $dUser['id_user']; ?>">
-											  Tambah User
+											  <i class="fas fa-user-edit"></i>
 											</button>
 											<a href="?p=huser&id=<?= $dUser['id_user']; ?>" class="btn btn-danger" onclick="return confirm('Yakin ?')"><i class="fas fa-trash"></i></a>
 										</td>
@@ -163,3 +167,11 @@ if(isset($_POST['ubahuser'])) {
     </div>
   </div>
 </div>
+
+<?php
+} else {
+	header("Location: index.php");
+	exit;
+} 
+
+?>
