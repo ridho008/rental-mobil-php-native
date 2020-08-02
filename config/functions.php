@@ -117,3 +117,46 @@ function ubahmobil($data)
   $sqlMobil = $conn->query("UPDATE tb_mobil SET no_polisi = '$polisi', merk = '$merk', tahun = '$tahun', hrg_mobil = '$hrg_mobil' WHERE id_mobil = $id_mobil") or die(mysqli_error($conn));
   return $conn->affected_rows;
 }
+
+
+// -----------------ORDER---------------------
+
+function tambahorder($data)
+{
+  global $conn;
+  $id_user = htmlspecialchars($data['id_user']);
+  $no_polisi = htmlspecialchars($data['polisi']);
+  $ktp = htmlspecialchars($data['ktp']);
+  $nama = htmlspecialchars($data['nama']);
+  $jk_order = htmlspecialchars($data['jk_order']);
+  $alamat = htmlspecialchars($data['alamat']);
+  $tujuan = htmlspecialchars($data['tujuan']);
+  $telp = htmlspecialchars($data['telp']);
+  $tglP = htmlspecialchars($data['tgl_pinjam']);
+  $tglK = htmlspecialchars($data['tgl_kembali']);
+  $tgl_pinjam = new DateTime($data['tgl_pinjam']);
+  $tgl_kembali = new DateTime($data['tgl_kembali']);
+
+  // menghitung selisih peminjam hari
+  $selisihHari = $tgl_kembali->diff($tgl_pinjam);
+  $x = $selisihHari->d;
+  // echo $x;
+
+  // total harga
+  $cariHarga = $conn->query("SELECT * FROM tb_mobil WHERE id_mobil = '$no_polisi'") or die(mysqli_error($conn));
+  $data = $cariHarga->fetch_assoc();
+  $harga = $x * $data['hrg_mobil'];
+
+  $sql = $conn->query("INSERT INTO tb_order VALUES (null, '$no_polisi', '$id_user', '$nama', '$ktp', '$jk_order', '$alamat', '$telp', '$tujuan', '$tglP', '$tglK', '$x', '$harga', 'Pinjam') ") or die(mysqli_error($conn));
+  $conn->query("UPDATE tb_mobil SET status_mobil = 'Sewa' WHERE id_mobil = $no_polisi") or die(mysqli_error($conn));
+  return $conn->affected_rows;
+}
+
+function kembalimobil()
+{
+  global $conn;
+  $id_order = htmlspecialchars($_POST['id_order']);
+  $conn->query("UPDATE tb_mobil SET status_mobil = 'Aktif'") or die(mysqli_error($conn));
+  $conn->query("DELETE FROM tb_order WHERE id_order = $id_order") or die(mysqli_error($conn));
+  return $conn->affected_rows;
+}

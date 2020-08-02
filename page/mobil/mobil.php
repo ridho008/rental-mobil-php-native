@@ -1,6 +1,6 @@
 <!-- menampilkan semua data tb_user -->
 <?php 
-$queryMobil = $conn->query("SELECT * FROM tb_mobil") or die(mysqli_error($conn));
+$queryMobil = $conn->query("SELECT * FROM tb_mobil WHERE status_mobil = 'Aktif'") or die(mysqli_error($conn));
 
 if(isset($_POST['tambahmobil'])) {
 	if(tambahmobil($_POST) > 0) {
@@ -25,6 +25,7 @@ if($_SESSION['level'] == 1) {
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#formTambahMobil">
   Tambah Mobil
 </button>
+<a href="<?= base_url('laporan/') ?>mcetakpdf.php" class="btn btn-secondary" target="_blank"><i class="fa fa-print"></i></a>
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-table mr-1"></i>

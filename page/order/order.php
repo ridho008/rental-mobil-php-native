@@ -2,11 +2,19 @@
 <?php 
 $queryOrder = $conn->query("SELECT * FROM tb_mobil, tb_order WHERE tb_mobil.id_mobil = tb_order.id_mobil") or die(mysqli_error($conn));
 
-if(isset($_POST['tambahmobil'])) {
-	if(tambahmobil($_POST) > 0) {
-		echo "<script>alert('Data Mobil berhasil ditambahkan.');window.location='?p=mobil';</script>";
+if(isset($_POST['tambahorder'])) {
+	if(tambahorder($_POST) > 0) {
+		echo "<script>alert('Data Order berhasil ditambahkan.');window.location='?p=order';</script>";
 	} else {
-		echo "<script>alert('Data Mobil gagal ditambahkan.');window.location='?p=mobil';</script>";
+		echo "<script>alert('Data Order gagal ditambahkan.');window.location='?p=order';</script>";
+	}
+}
+
+if(isset($_POST['kembali'])) {
+	if(kembalimobil() > 0) {
+		echo "<script>alert('Mobil berhasil dikembalikan.');window.location='?p=order';</script>";
+	} else {
+		echo "<script>alert('Mobil gagal dikembalikan.');window.location='?p=order';</script>";
 	}
 }
 
@@ -25,6 +33,7 @@ if($_SESSION['level'] == 1) {
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#formTambahOrder">
   Tambah Data Order
 </button>
+<a href="<?= base_url('laporan/') ?>ocetakpdf.php" class="btn btn-secondary" target="_blank"><i class="fa fa-print"></i></a>
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-table mr-1"></i>
@@ -42,7 +51,8 @@ if($_SESSION['level'] == 1) {
                         <th>Tujuan</th>
                         <th>Tanggal Pinjam</th>
                         <th>Tanggal Kembali</th>
-                        <th>Total Harga</th>
+                        <th>Lama Sewa</th>
+                        <th>Total Sewa</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -59,52 +69,17 @@ if($_SESSION['level'] == 1) {
 										<td><?= $dOrder['tujuan']; ?></td>
 										<td><?= $dOrder['tgl_pinjam']; ?></td>
 										<td><?= $dOrder['tgl_kembali']; ?></td>
-										<td><?= $dOrder['hrg_total']; ?></td>
+										<td><?= $dOrder['lama']; ?> Hari</td>
+										<td>Rp.<?= number_format($dOrder['hrg_total']); ?></td>
 										<td>
-											<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#formUbahOrder<?= $dOrder['id_order']; ?>">
-											  <i class="fas fa-user-edit"></i>
-											</button>
-											<a href="?p=hmobil&id=<?= $dOrder['id_order']; ?>" class="btn btn-danger" onclick="return confirm('Yakin ?')"><i class="fas fa-trash"></i></a>
+											<!-- <a href="?p=km&id=<?= $dOrder['id_mobil']; ?>" class="btn btn-warning">Kembali</a> -->
+											<form action="" method="post">
+												<input type="hidden" name="id_order" value="<?= $dOrder['id_order']; ?>">
+												<button type="submit" name="kembali" class="btn btn-primary"><i class="fa fa-car"></i>Kembali</button>
+											</form>
+											<!-- <a href="?p=hmobil&id=<?= $dOrder['id_order']; ?>" class="btn btn-danger" onclick="return confirm('Yakin ?')"><i class="fas fa-trash"></i></a> -->
 										</td>
 									</tr>
-									<!-- Modal Tambah User -->
-									<div class="modal fade" id="formUbahOrder<?= $dOrder['id_order']; ?>" tabindex="-1" role="dialog" aria-labelledby="formUbahMobilLabel" aria-hidden="true">
-									  <div class="modal-dialog">
-									    <div class="modal-content">
-									      <div class="modal-header">
-									        <h5 class="modal-title" id="formUbahMobilLabel">Ubah Data Mobil</h5>
-									        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-									          <span aria-hidden="true">&times;</span>
-									        </button>
-									      </div>
-									      <div class="modal-body">
-									        <form action="" method="post">
-									        	<input type="text" name="id" value="<?= $dMobil['id_mobil']; ?>">
-									        	<div class="form-group">
-										      		<label for="polisi">No.Polisi</label>
-										      		<input type="text" name="polisi" value="<?= $dMobil['no_polisi']; ?>" id="polisi" class="form-control">
-										      	</div>
-										      	<div class="form-group">
-										      		<label for="merk">Merk</label>
-										      		<input type="text" name="merk" id="merk" class="form-control" value="<?= $dMobil['merk']; ?>">
-										      	</div>
-										      	<div class="form-group">
-										      		<label for="tahun">Tahun</label>
-										      		<input type="number" name="tahun" id="tahun" class="form-control" value="<?= $dMobil['tahun']; ?>">
-										      	</div>
-										      	<div class="form-group">
-										      		<label for="hrg_mobil">Harga</label>
-										      		<input type="number" name="hrg_mobil" id="hrg_mobil" class="form-control" value="<?= $dMobil['hrg_mobil']; ?>">
-										      	</div>
-												      <div class="modal-footer">
-												        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-												        <button type="submit" name="ubahmobil" class="btn btn-primary">Ubah</button>
-												      </div>
-									        </form>
-									      </div>
-									    </div>
-									  </div>
-									</div>
                 	<?php } ?>
                 </tbody>
             </table>
@@ -125,25 +100,65 @@ if($_SESSION['level'] == 1) {
       </div>
       <div class="modal-body">
         <form action="" method="post">
+        	<input type="text" name="id_user" value="<?= $_SESSION['id_user']; ?>">
         	<div class="form-group">
         		<label for="polisi">No.Polisi</label>
-        		<input type="text" name="polisi" id="polisi" class="form-control">
+        		<select name="polisi" id="polisi" class="form-control">
+        			<option value="">Pilih No.Polisi</option>
+        			<?php 
+        			$tampilNoPolisi = $conn->query("SELECT * FROM tb_mobil");
+        			while($dPolisi = $tampilNoPolisi->fetch_assoc()) {
+        			?>
+        			<option value="<?= $dPolisi['id_mobil']; ?>"><?= $dPolisi['no_polisi']; ?></option>
+        			<?php } ?>
+        		</select>
         	</div>
         	<div class="form-group">
-        		<label for="merk">Merk</label>
-        		<input type="text" name="merk" id="merk" class="form-control">
+        		<label for="ktp">No.Ktp</label>
+        		<input type="text" name="ktp" id="ktp" class="form-control">
         	</div>
         	<div class="form-group">
-        		<label for="tahun">Tahun</label>
-        		<input type="number" name="tahun" id="tahun" class="form-control">
+        		<label for="nama">Nama Order</label>
+        		<input type="text" name="nama" id="nama" class="form-control">
         	</div>
         	<div class="form-group">
-        		<label for="hrg_mobil">Harga</label>
-        		<input type="number" name="hrg_mobil" id="hrg_mobil" class="form-control">
+        		<label>Jenis Kelamin</label>
+        		<div class="form-check">
+						  <input class="form-check-input" type="radio" name="jk_order" id="jk_order" value="L">
+						  <label class="form-check-label" for="jk_order">
+						    Pria
+						  </label>
+						</div>
+						<div class="form-check">
+						  <input class="form-check-input" type="radio" name="jk_order" id="jk_order" value="P">
+						  <label class="form-check-label" for="jk_order">
+						    Perempuan
+						  </label>
+						</div>
+        	</div>
+        	<div class="form-group">
+        		<label for="alamat">Alamat</label>
+						<textarea name="alamat" id="alamat" class="form-control"></textarea>
+        	</div>
+        	<div class="form-group">
+        		<label for="alamat">Tujuan</label>
+        		<input type="text" name="tujuan" id="tujuan" class="form-control">
+        	</div>
+        	<div class="form-group">
+        		<label for="telp">Telepon</label>
+        		<input type="number" name="telp" id="telp" class="form-control">
+        	</div>
+        	<div class="form-group">
+        		<label for="tgl_pinjam">Tanggal Pinjam</label>
+        		<input type="date" name="tgl_pinjam" id="tgl_pinjam" class="form-control">
+        	</div>
+        	<div class="form-group">
+        		<label for="tgl_kembali">Tanggal Kembali</label>
+        		<input type="date" name="tgl_kembali" id="tgl_kembali" class="form-control">
         	</div>
 			      <div class="modal-footer">
 			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-			        <button type="submit" name="tambahmobil" class="btn btn-primary">Tambah</button>
+			        <button type="submit" name="tambahorder" class="btn btn-primary">Tambah</button>
 			      </div>
         </form>
       </div>
